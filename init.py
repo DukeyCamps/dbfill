@@ -18,14 +18,15 @@ def wraptext(text):
 
 
 class SQLWORKER:
-    LOGO = '''
+    LOGO = """
    __                             __   
   / /   ____  _____ _____ __      \ \  
  / /   |    \| __  |   __|  |      \ \ 
 < <    |  |  | __ -|   __|  |__     > >
  \ \   |____/|_____|__|  |_____|   / / 
   \_\                             /_/  
-'''
+     @github.com/dukeycamps/dbfill\n
+"""
     text_values = []
     range_start = range_end = range_multi = None
     db_name = ''
@@ -34,20 +35,15 @@ class SQLWORKER:
     c = None
     root_columns = None
     root_types = None
-# TODO:Incorporate it somehow
+    # TODO: Incorporate it somehow
 
     def make_wordlist(self):
-        word_list = []
         print("Please craft your wordlist below, [for TEXT types] separated by [spaces]")
         stringz = input()
-        word_list = stringz.split()
-      
-
-        
+        self.text_values = stringz.split()
 
     def make_range(self):
-        print("Declare your range [start end multiplier] [eg. 0 2000 10 generates 0, 10, 20, ... up to 20.000]")
-        #Don't want to confuse people when its actually 20000 - 10 using the range
+        print("Declare your range [start end multiplier] [eg. 0 2000 25]")
         stringz = input().split()
         self.range_start = int(stringz[0])
         self.range_end = int(stringz[1])
@@ -59,38 +55,34 @@ class SQLWORKER:
         self.conn = conn
         self.c = c
 
-    def create_table_str(self):  # DONE, WORKS LIKE A CHARM
-        # TODO: MAKE IT ITS OWN METHOD THAT CAN BE ACCESSED THROUGH THE CLASS OBJECT
+    def create_table_str(self):
         table_name = input("Table Name ->")
         self.root_table_name = table_name
         list_columns = []
         list_types = []
         columns = int(input("Number of columns ->"))
+        
         for column in range(columns):
             list_columns.append(input("Column %s NAME ->" % (column+1)))
-            list_types.append(input("Column %s TYPE ->" %
-                                    (list_columns[column])))
-        self.root_columns = list_columns
+            list_types.append(input("Column %s TYPE ->" % (list_columns[column])))
         self.root_types = list_types
         print('\n')
+        
         for lol in range(len(list_columns)):
             print("%s , %s" % (list_columns[lol], list_types[lol]))
-        satisfied = input("Are you happy with this configuration?").lower()
+        satisfied = input("Are you happy with this configuration? [yes]").lower()
 
         if satisfied == 'yes' or satisfied == '':
             tabstring = ''
-            # for in range, COLUMN TYPE, COLUMN TYPE,
             for lol in range(len(list_columns)):
                 tabstring += "%s %s, " % (list_columns[lol], list_types[lol])
-            # print(tabstring[:-1])
             return table_name, tabstring[:-2]
         else:
             self.create_table_str()
 
     def create_table(self):
         self.connect()
-        self.c.execute('''CREATE TABLE IF NOT EXISTS %s(%s)''' %
-                       (self.create_table_str()))
+        self.c.execute('''CREATE TABLE IF NOT EXISTS %s(%s)''' %(self.create_table_str()))
 
     def __init__(self):
 
@@ -127,36 +119,11 @@ class SQLWORKER:
         # TODO: MAKE EVERYTHING CLASS BASED, NO PRE INPUT
         self.connect()
         for x in tqdm(range(times)):
-            # time.sleep(0.02)
-            #print('starting %s'%x)
             self.c.execute("INSERT INTO %s VALUES(%s)" %(self.root_table_name, self.data2str()))
         self.conn.commit()
         self.conn.close()
-        # insert_values(wraptext(ExampleValues.modes()), wraptext(ExampleValues.ID(10000)), ExampleValues.prices(ranger=50, step=10), x)
 
-
-#ExampleValues = XAMPLER()
-# for x in range(50):
-#    Boy_Cott.insert_values(wraptext(ExampleValues.modes()), wraptext(ExampleValues.ID(10000)), ExampleValues.prices(ranger=50, step=10), x)
-#    print('executed')
-# Boy_Cott.insert_values(times=int(input("How many random values do you wish to store?")))
 Boy_Cott = SQLWORKER();look_busy()
 Boy_Cott.create_table();look_busy()
 Boy_Cott.insert_values(int(input("How many random rows do you want to generate?")));look_busy()
 input("\nPress Enter to exit.")
-#listyboy = Boy_Cott.get_columns('stocks')
-# print(listyboy)
-
-
-# self, mode, ID, qty, price, times=1000
-
-
-# Would you like to store something today?
-# How many values
-
-
-# What do you want to do?
-# [1] CREATE A TABLE AND FILL IT #TODO: WORKS, NOW SAVE THE VALUES
-# [2] USE THE TYPES LIST TO GET THE RIGHT TYPES FOR THE GENERATOR
-# [3] INSERT VALUES
-# [4] PROFIT
